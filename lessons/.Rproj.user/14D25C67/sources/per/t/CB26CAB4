@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1547565806793.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1562747932",
+    "id" : "CB26CAB4",
+    "lastKnownWriteTime" : 1548123207,
+    "last_content_update" : 1548123207487,
+    "path" : "~/~/quant_methods/R_intermediate Assignment.Rmd",
+    "project_path" : null,
+    "properties" : {
+        "cursorPosition" : "107,5",
+        "scrollLine" : "101"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

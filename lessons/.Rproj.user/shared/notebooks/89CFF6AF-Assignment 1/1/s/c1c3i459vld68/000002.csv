@@ -1,0 +1,4 @@
+"0","plot(richness, scale, log='xy', main=""Relationship Between Scale and Richness"", xlab=""Richness"", ylab=""Scale"", pch=18)"
+"2","Error in plot(richness, scale, log = ""xy"", main = ""Relationship Between Scale and Richness"",  : 
+  object 'richness' not found
+"
