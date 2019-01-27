@@ -1,0 +1,59 @@
+---
+title: "R introduction"
+author: "Luke Stageberg"
+date: "January 10, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Download and read in the datafile “./quant_methods/data/tgpp.csv” from the class website. This dataset represents the vascular plant species richness that was collected from the Tallgrass Prairie Preserve from 10 x 10 m quadrats. Species richness is simply the number of species that occur within a quadrat.
+
+```{r}
+tgpp = read.csv("https://raw.githubusercontent.com/dmcglinn/quant_methods/gh-pages/data/tgpp.csv")
+```
+
+Read the data into R, note this datafile has a header (i.e., it has column names) unlike the example we examined in class.
+
+What are the names of the columns in this dataset?
+
+```{r}
+colnames(tgpp, do.NULL = TRUE, prefix = "col")
+```
+
+How many rows and columns does this data file have?
+
+```{r}
+nrow(tgpp)
+ncol(tgpp)
+```
+
+What kind of object is each data column? Hint: checkout the function sapply().
+
+```{r}
+sapply(tgpp, class)
+```
+
+What are the values of the the datafile for rows 1, 5, and 8 at columns 3, 7, and 10
+
+```{r}
+tgpp[1,3]
+tgpp[5,7]
+tgpp[8,10]
+```
+
+Create a pdf of the relationship between the variables “scale” and “richness”. Scale is the area in square meters of the quadrat in which richness was recorded. Be sure to label your axes clearly, and choose a color you find pleasing for the points. To get a list of available stock colors use the function colors(). Also see this link:
+
+```{r}
+plot(richness, scale, log='xy', main="Relationship Between Scale and Richness", xlab="Richness", ylab="Scale", pch=18)
+```
+
+http://research.stowers-institute.org/efg/R/Color/Chart/index.htm.
+
+What happens to your plot when you set the plot argument log equal to ‘xy’. plot(..., log='xy')
+
+
