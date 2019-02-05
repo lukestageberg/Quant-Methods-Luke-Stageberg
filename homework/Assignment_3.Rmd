@@ -1,0 +1,135 @@
+---
+title: "Assignment 3"
+author: "Luke Stageberg"
+date: "Feburary 4, 2019"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+trees = read.csv('https://raw.githubusercontent.com/dmcglinn/quant_methods/gh-pages/data/treedata.csv')
+```
+
+```{r}
+str(trees)
+```
+
+```{r}
+trees_meta = read.csv ('https://raw.githubusercontent.com/dmcglinn/quant_methods/gh-pages/data/tree_metadata.txt')
+```
+
+1.
+```{r}
+acer = trees[trees$species == "Acer rubrum", ]
+```
+
+```{r}
+abies = trees[trees$species == "Abies fraseri", ]
+```
+
+
+```{r}
+acer_mod = lm (acer$cover ~ acer$elev + acer$tci + acer$streamdist + acer$disturb + acer$beers)
+summary (acer_mod)
+```
+
+```{r}
+library(car)
+Anova(acer_mod, type=3)
+```
+
+```{r}
+abies_mod = lm (abies$cover ~ abies$elev + abies$tci + abies$streamdist + abies$disturb + abies$beers)
+summary(abies_mod)
+```
+
+```{r}
+library(car)
+Anova(abies_mod, type=3)
+```
+
+How well does the exploratory model appear to explain cover?
+
+Abies fraseri:
+  Summary: p-value: 6.482e-10
+  There is strong statistical evidnce that there is a relationship with cover (very small p-value). Therefore the model appears to explain cover extremely well.
+  Anova: p-value: 1.557e-05
+  There is also strong statistical evidence that there is a relationship with cover (very small p-value). Therefore the model appears to explain cover well but not quite as well as the summary shows.
+
+Acer rubrum:
+  Summary: p-value: 7.48e-05
+  There is strong statistical evidnce that there is a relationship with cover (very small p-value). Therefore the model appears to explain cover extremely well (although not as well as Abies fraseri according to the summary)
+  Anova: p-value: 2.2e-16
+  There is also strong statistical evidence that there is a relationship with cover (very small p-value). Therefore the model appears to explain cover extremely well and more accurately than the summary shows.
+
+
+Which explanatory variables are the most important?
+
+Abies fraseri
+In order: elev, tci, beers, streamdist, disturb
+
+Acer rubrum
+In order: beers, elev, streamdist, disturb, tci
+
+(used p-vaules from Anova tests, the lower the p-value the more important the variable)
+
+
+Do model diagnostics indicate any problems with violations of OLS assumptions?
+
+OLS assumptions:
+1. Linearity such that y is a linear combination of the x-variables. Because the x variables may be transformed this is a less restrictive assumption then it may seem.
+2. No error in the independent variables.
+3. Homoscedasticity of errors which means that error around the regression line is equal across the range of x values.
+4. Independence of errors such that the direction and magnitude of error is not correlated between samples.
+
+Violates number 3 because the error around the regression line is not equal across the range of x values (for both species)
+
+Are you able to explain variance in one species better than another, why might this be the case?
+
+Yes, in acer rubrum because the p-value in the Anova test is smaller than the p-value from abies fraseri. Acer rubrum trees most likely are affected more by cover than abies fraseri trees.
+
+
+2.
+```{r}
+acer_poi = glm(acer$cover ~ acer$elev + acer$tci + acer$streamdist + acer$disturb + acer$beers, data = acer, 
+             family = 'poisson')
+```
+
+
+```{r}
+abies_poi = glm(abies$cover ~ abies$elev + abies$tci + abies$streamdist + abies$disturb +abies$beers, data = abies, 
+            family = 'poisson')
+```
+
+```{r}
+pseudo_r2 = function(glm_mod) {
+                1 -  glm_mod$deviance / glm_mod$null.deviance
+            }
+```
+
+
+```{r}
+pseudo_r2(abies_poi)
+```
+
+```{r}
+pseudo_r2(acer_poi)
+```
+
+```{r}
+library(car)
+Anova(abies_poi, type=3)
+```
+
+```{r}
+library(car)
+Anova(acer_poi, type=3)
+```
+
+Does it appear that changing the error distribution changed the results much? In what ways?
+
+Yes, it changes the order of which explanitory variables are the most important.
+
+3. In both species cover is strongly realted with the rest of the data. It is more related to the rest of the data for the acer rubrum species. This means that cover is an important factor in the dataset and you can tell a lot about the particualr tree from only looking at cover.
+
