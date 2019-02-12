@@ -1,0 +1,162 @@
+---
+title: "Multivariate_Models_HW"
+author: "Luke Stageberg"
+date: "February 6, 2019"
+output: html_document
+---
+
+```{r}
+install.packages("vegan")
+```
+```{r}
+install.packages("permute")
+```
+```{r}
+install.packages("lattice")
+```
+
+```{r}
+library(vegan)
+data("dune")
+data("dune.env")
+?dune
+```
+
+1.Conduct an indirect ordination on the dune plant community. Specifically, visually examine a NMDS plot using the bray-curtis distance metric. Below is some code to help you develop a potential plot that emphasizes the role of the environmental variable “Moisture”.
+
+```{r}
+dune_mds = metaMDS(dune)
+```
+
+```{r}
+plot(dune_mds, type='n')
+ text(dune_mds, 'sp', cex=.5)
+ # generate vector of colors 
+ color_vect = rev(terrain.colors(6))[-1]
+ points(dune_mds, 'sites', pch=19, 
+        col=color_vect[dune.env$Moisture])
+ legend('topright', paste("Moisture =", 1:5, sep=''), 
+        col=color_vect, pch=19)
+```
+
+Describe how you interpret the graphic. 
+
+The first axis (x axis) is the difference of the sites. The y axis shows the next biggest spread (next most importnat hypothetical axis). The moisture of each site has been configured and ranked from 1 to 5 and was then plotted and laid on top of the original plot. 
+
+What is the goal of creating such a plot?
+
+To get a first glance at the data and see if we can make any hypothesizes about if and how moisture might explain the variation in the dataset.  
+
+Does this analysis suggest any interesting findings with respect to the dune vegetation?
+
+It appears that moisture explains variation along the x axis very well with dryer sites being farther left and wetter sites being farther right. Moisture does not explain any variation along the y axis.
+
+
+2. Carry out a direct ordination using CCA in order to test any potential hypotheses that you developed after examining the MDS plot. Specifically, carry out a test of the entire model (i.e., including all constrained axes) and also carry out tests at the scale of individual explanatory variables you included in your model if you included more than one variable. Plot your results.
+
+```{r}
+cca_dune = cca(dune ~ ., data = dune.env)
+RsquareAdj(cca_dune, 100)
+```
+
+```{r}
+anova(cca_dune, permutations = 999)
+```
+
+```{r}
+anova(cca_dune, by = "margin", permutations = 999)
+```
+
+```{r}
+plot(cca_dune, type = "n", scaling = 1)
+orditorp(cca_dune, display = "sp", cex = 0.5, scaling = 1, col = "blue")
+text(cca_dune, display = "bp", col = "red")
+```
+
+```{r}
+cca_dune_moisture = cca(dune ~ Moisture, dune.env)
+RsquareAdj(cca_dune, 100)
+```
+
+```{r}
+anova(cca_dune_moisture, permutations = 999)
+```
+
+
+```{r}
+plot(cca_dune_moisture, type = "n", scaling = 1)
+orditorp(cca_dune_moisture, display = "sp", cex = 0.5, scaling = 1, col = "blue")
+text(cca_dune_moisture, display = "bp", col = "red")
+```
+
+```{r}
+cca_dune_management = cca(dune ~ Management, dune.env)
+RsquareAdj(cca_dune, 100)
+```
+
+```{r}
+anova(cca_dune_management, permutations = 999)
+```
+
+```{r}
+plot(cca_dune_management, type = "n", scaling = 1)
+orditorp(cca_dune_management, display = "sp", cex = 0.5, scaling = 1, col = "blue")
+text(cca_dune_management, display = "bp", col = "red")
+```
+
+```{r}
+cca_dune_use = cca(dune ~ Use, dune.env)
+RsquareAdj(cca_dune, 100)
+```
+
+```{r}
+anova(cca_dune_use, permutations = 999)
+```
+
+```{r}
+plot(cca_dune_use, type = "n", scaling = 1)
+orditorp(cca_dune_use, display = "sp", cex = 0.5, scaling = 1, col = "blue")
+text(cca_dune_use, display = "bp", col = "red")
+```
+
+```{r}
+cca_dune_manure = cca(dune ~ Manure, dune.env)
+RsquareAdj(cca_dune, 100)
+```
+
+```{r}
+anova(cca_dune_manure, permutations = 999)
+```
+
+```{r}
+plot(cca_dune_manure, type = "n", scaling = 1)
+orditorp(cca_dune_manure, display = "sp", cex = 0.5, scaling = 1, col = "blue")
+text(cca_dune_manure, display = "bp", col = "red")
+```
+
+```{r}
+cca_dune_A1 = cca(dune ~ A1, dune.env)
+RsquareAdj(cca_dune, 100)
+```
+
+```{r}
+anova(cca_dune_A1, permutations = 999)
+```
+
+```{r}
+plot(cca_dune_A1, type = "n", scaling = 1)
+orditorp(cca_dune_A1, display = "sp", cex = 0.5, scaling = 1, col = "blue")
+text(cca_dune_A1, display = "bp", col = "red")
+```
+
+
+3. Do your two analyses agree with one another or complement one another or do these two analyses seem to be suggesting different take home messages? 
+
+The two analyses do not agree with one another. The NMDS plot using the bray-curtis distance metric shows that there is a direct relationship with moisture. It appears that moisture explains variation along the x axis very well with dryer sites being farther left and wetter sites being farther right. But when analyzing moisture along with the other variables in Canonical Correspondence Analysis, we find out that the assumed variance explained by moisture does not happen when the entire data is analyzed together.
+
+Which analysis do you find to be more useful?
+
+If the first analysis held up to be useful in explaining variance for the whole dataset, then I would easily chose the NMDS plot. It is simple, clear, and easy to follow. But because the assumed variation that appears in the first plot does is not shown in the CCAs, the CCA with all the variables is the most useful. It is more difficult to interpret and understand, but it is accurate and encompasses all of the varibales in the dataset. 
+
+
+
