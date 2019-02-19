@@ -1,0 +1,155 @@
+---
+title: "Spatial Modeling Assignment"
+author: "Luke Stageberg"
+date: "February 13, 2019"
+output: html_document
+---
+
+```{r}
+library(vegan)
+data(BCI)
+## UTM Coordinates (in metres)
+BCI_xy = data.frame(x = rep(seq(625754, 626654, by=100), each=5), 
+                    y = rep(seq(1011569,  1011969, by=100), len=50))
+```
+
+```{r}
+library(nlme)
+```
+
+```{r}
+dim(BCI)
+```
+
+1.
+```{r}
+species_abundance = colSums(BCI)
+species_abundance
+
+hist(log10(species_abundance))
+plot(BCI_xy, cex=species_abundance/max(species_abundance))
+```
+```{r}
+col_brks = hist(species_abundance, plot = F)$breaks
+col_indices = as.numeric(cut(species_abundance, col_brks))
+cols = rev(terrain.colors(length(col_brks)))
+plot(BCI_xy, pch = 19, col = cols[col_indices])
+```
+This graphic does not help us examine spatial dependence. We must rare species seperate from common ones.
+
+```{r}
+ifelse(species_abundance > 1700, print(BCI[,]), NA)
+ifelse(species_abundance > 10 & species_abundance < 20, print(BCI[,]), NA)
+```
+
+```{r}
+common = BCI$Trichilia.tuberculata
+
+rare = BCI$Siparuna.guianensis
+
+common2 = BCI$Faramea.occidentalis
+
+rare2 = BCI$Cavanillesia.platanifolia
+hist(common)
+
+
+col_brks = hist(common, plot = F)$breaks
+col_brks
+```
+```{r}
+col_indices = as.numeric(cut(common, col_brks))
+col_indices
+```
+
+```{r}
+cols = rev(terrain.colors(length(col_brks)))
+plot(BCI_xy, pch = 19, cex = 2, col=cols[col_indices])
+```
+The most abundant species was chosen (Trichilia tuberculata) and there does not appear to be clear spatial dependence.
+
+```{r}
+hist(common2)
+```
+
+```{r}
+col_brks_2 = hist(common2, plot = F)$breaks
+col_indices_2 = as.numeric(cut(common2, col_brks))
+cols_2 = rev(terrain.colors(length(col_brks)))
+plot(BCI_xy, pch = 19, cex = 2, col=cols[col_indices_2])
+```
+The second most abundant species was chosen (Faramea occidentalis) and there does appear to be some spatial dependence.
+
+```{r}
+col_brks_rare = hist(rare, plot = F)$breaks
+col_indices_rare = as.numeric(cut(rare, col_brks_rare))
+cols_rare = rev(terrain.colors(length(col_brks_rare)))
+plot(BCI_xy, pch = 19, cex = 2, col=cols[col_indices_rare])
+```
+The rare species Siparuna guianensis shows obvious and very clear spatial dependence.
+
+```{r}
+col_brks_rare2 = hist(rare2, plot = F)$breaks
+col_indices_rare2 = as.numeric(cut(rare2, col_brks_rare2))
+cols_rare2 = rev(terrain.colors(length(col_brks_rare2)))
+plot(BCI_xy, pch = 19, cex = 2, col=cols[col_indices_rare2])
+```
+The rare species Cavanillesia platanifolia shows some spatial dependence but it is not as clear as Siparuna guianensis.
+
+
+2.
+```{r}
+gls_one_predictor = gls(Drypetes.standleyi ~ Quassia.amara, data = BCI)
+gls_one_predictor
+```
+
+```{r}
+gls_all_predictors = gls(Drypetes.standleyi ~ Cordia.lasiocalyx + Hirtella.triandra + Picramnia.latifolia + Quassia.amara +
+           Tabernaemontana.arborea + Trattinnickia.aspera +  Xylopia.macrantha, data = BCI)
+gls_all_predictors
+```
+
+```{r}
+x <- BCI_xy$x
+y <- BCI_xy$y
+one_predictor_exp = update(gls_one_predictor, corr=corExp(form = ~ x + y))
+plot(Variogram(one_predictor_exp))
+```
+
+```{r}
+plot(Variogram(one_predictor_exp, resType='normalized'))
+```
+
+```{r}
+gls_all_predictors_exp = update(gls_all_predictors, corr=corExp(form = ~ x + y))
+plot(Variogram(gls_all_predictors_exp))
+```
+
+```{r}
+plot(Variogram(one_predictor_exp, resType='normalized'))
+```
+
+```{r}
+anova(gls_one_predictor)
+```
+
+```{r}
+anova(one_predictor_exp)
+```
+
+
+```{r}
+anova(gls_all_predictors)
+```
+
+```{r}
+anova(gls_all_predictors_exp)
+```
+
+Did including the spatial error term have a large impact on the coefficients of the model?
+Yes, it appears to be a completely different model.
+
+Did including the spatial error terms significantly improve model fit (use function anova to carry out model comparison)?
+Including the spatial error terms significantly increases the p-values for both the single species predictor and the all species predictors. Thus, it did not significantly improve model fit.
+
+Explain why you did or did not observe a difference in the influence of adding the spatial error term between the two models.
+There was a noticable difference when adding the spacial error terms to each of the models. This shows that the origanlly anova tests are not quite as good as it first appeared. This shows that the set is not quite as spatially dependent as it originally appeared from the gls models and annva tests.
